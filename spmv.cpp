@@ -8,6 +8,7 @@
 #include "types.h"
 #include "worker.h"
 #include "network.h"
+#include "linalg.h"
 
 void thread_func(Network& network, Worker& worker, int my_id) {
     while (!worker.done()) {
@@ -89,4 +90,18 @@ int main(int argc, char* argv[]) {
     for (auto& t : threads) {
         t.join();
     }
+
+    for (auto& y_part : y_parts) {
+        for (auto& [idx, val] : y_part) {
+            y.at(idx) = val;
+        }
+    }
+
+    auto y_ref = spmv(csc_mtx, v);
+    auto res_vector = vec_sub(y, y_ref);
+    auto res_norm = vec_norm(res_vector);
+    auto y_norm = vec_norm(y_ref);
+
+    fmt::print("Residual norm: {}, relative err: {}\n", res_norm, res_norm / y_norm);
+
 }

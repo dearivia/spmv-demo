@@ -2,3 +2,4 @@
 .sconsign.dblite
 spmv
 .nfs*
+.vscode/browse.vc.*
