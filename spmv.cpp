@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
             auto val = csc_mtx.values.at(r);
             auto thread_id = r % nthreads;
             matrix_parts[thread_id][col_ptr].push_back({row, val});
-            coords_to_thread[{col_ptr, row}] = thread_id;
+            coords_to_thread[{row, col_ptr}] = thread_id;
         }
     }
 
