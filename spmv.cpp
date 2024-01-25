@@ -29,8 +29,8 @@ int main(int argc, char* argv[]) {
 
     Network network(nthreads);
 
-    std::vector<double> v(csc_mtx.num_rows, 1.0);
-    std::vector<double> y(csc_mtx.num_cols, 0.0);
+    std::vector<double> v(csc_mtx.num_cols, 1.0);
+    std::vector<double> y(csc_mtx.num_rows, 0.0);
 
     std::vector<ColSpMatrix> matrix_parts(nthreads);
     std::vector<SpVector> v_parts(nthreads);
