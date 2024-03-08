@@ -4,7 +4,7 @@
 #include <cassert>
 #include <cmath>
 
-std::vector<double> spmv(const CSCMatrix<int,double>& csc_mtx,
+std::vector<double> spmv(const MatrixMarket::CSCMatrix<int,double>& csc_mtx,
                          const std::vector<double>& v) {
 
     std::vector<double> y(csc_mtx.num_rows, 0.0);

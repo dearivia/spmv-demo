@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    auto csc_mtx = read_csc<int,double>(argv[1]);
+    auto csc_mtx = MatrixMarket::read_csc<int,double>(argv[1]);
     int nthreads = std::stoi(argv[2]);
 
     Network network(nthreads);
