@@ -26,7 +26,7 @@ struct fmt::formatter<Message> {
     }
 
     template <typename FormatContext>
-    auto format(const Message& msg, FormatContext& ctx) {
+    auto format(const Message& msg, FormatContext& ctx) const {
         return format_to(ctx.out(), "Message(type={}, dest={}, coord={}, payload={})", 
                 msg.type, msg.dest, msg.coord, msg.payload);
     }
