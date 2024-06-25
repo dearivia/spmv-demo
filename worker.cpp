@@ -24,17 +24,41 @@ bool Worker::done() const {
     return done_flag;
 }
 
-// This is purely a demo placeholder
 void Worker::handle_message(Message msg) {
     fmt::print("Worker {} handling message {}\n", id, msg);
     switch (msg.type) {
-        case 0:
-            network.send(Message(1, (id + 1) % network.nthreads, 0, 0.0));
+        case 0: //case 0 go through vector, send workers messages of where it wants to multiply
+            for (const auto& v : my_v){ //go through the vector SpVector = std::map<int,double>; //idx, val
+                int m_worker = coords_to_thread.at(v.first); //finds M worker in column
+                network.send(Message(1, m_worker, v.first, v.second));//send message 1 to multiply
+            }
             break;
-        case 1:
+        case 1: //scenario 1: given vector, worker calculates csc, my_v, and sends it to worker in charge of y  
+            for (const auto& row : my_csc.at(msg.coord)) { //idx, val
+                double res = row.second*msg.payload;//result[row] += matrix[row][col]*vector[col]
+                int y_worker = y_idx_to_thread.at(row.first);//the worker in charge of result[row]
+                if ((y_worker != id)||((y_worker == id)&&(y_updates_left[row.first]==0))){ //check if i own y, check if waiting on any other partial sums in col
+                    network.send(Message(2, y_worker, row.first, res));//send worker in charge of result to change y
+                }
+                //add to my_y directly or add to partial here. 
+            }
+            //network.send(Message(1, (id + 1) % network.nthreads, 0, 0.0)); //raise done_flag! (aka sends this to the queue of jobs)
+            break;
+        case 2: //scenario 2: worker in charge of y receives the partial sums from the earlier multiplication for y
+            partial_sums[msg.coord] += msg.payload;
+            y_updates_left[msg.coord]--;
+            if (y_updates_left[msg.coord]==0){
+                my_y[msg.coord] = partial_sums[msg.coord];
+            }
+            //if everything is done, then set done value to be done, be careful of scenario 1
+            //my_y[msg.coord] += msg.payload; message coordinate of y adds result to summation
+            //increment how many updates had and check if updates = needed
+            //wait until all summations are gotten before sending
+            break;
+        case 3: //scenario 3: when worker is done processing
             done_flag = true;
             break;
-        default:
+        default: //scenario 3: error
             fmt::print("Worker {} received unknown message type {}\n", id, msg.type);
     }
 }
