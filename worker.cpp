@@ -49,9 +49,7 @@ void Worker::handle_message(Message msg) {
             for (const auto& row : my_csc.at(msg.coord)) { //idx, val
                 double res = row.second*msg.payload;//result[row] += matrix[row][col]*vector[col]
                 int y_worker = y_idx_to_thread.at(row.first);//the worker in charge of result[row]
-                if ((y_worker != id)||((y_worker == id)&&(y_updates_left[row.first]==0))){ //check if i own y, check if waiting on any other partial sums in col
-                    network.send(Message(2, y_worker, row.first, res));//send worker in charge of result to change y
-                }
+                network.send(Message(2, y_worker, row.first, res));//send worker in charge of result to change y
                 //add to my_y directly or add to partial here. 
             }
             //network.send(Message(1, (id + 1) % network.nthreads, 0, 0.0)); //raise done_flag! (aka sends this to the queue of jobs)
