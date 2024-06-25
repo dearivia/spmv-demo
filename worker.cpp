@@ -18,6 +18,18 @@ Worker::Worker(Network& _network,
     my_v(_my_v), 
     my_y(_my_y), 
     id(_my_id) {
+    for (auto& y : y_idx_to_thread) { //fill out y_updates VecMap = std::map<int, int>; //idx of vector to where it's stored
+        y_updates_left[y.first] = 0; //update index to 0
+        partial_sums[y.first] = 0;
+    }
+
+
+    for (auto& col : my_csc){ //using ColSpMatrix = std::map<int, std::vector<std::pair<int,double>>>; //col_idx -> (row_idx,val)
+//index into map, pull out second vector and loop through vector
+        for (const auto& row : col.second) {
+            y_updates_left[row.first]++; //loop through, if col, row exists, then update++
+        }
+    }
 }
 
 bool Worker::done() const {
