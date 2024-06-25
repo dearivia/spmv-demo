@@ -29,4 +29,6 @@ private:
 
     // Can add more fields here
     bool done_flag = false;
+    std::map<int, int> y_updates_left; //idx, val
+    std::map<int, double> partial_sums; //idx, val
 };
