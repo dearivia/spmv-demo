@@ -41,15 +41,8 @@ void Worker::handle_message(Message msg) {
     switch (msg.type) {
         case 0: //case 0 go through vector, send workers messages of where it wants to multiply
             for (const auto& v : my_v){ //go through the vector SpVector = std::map<int,double>; //idx, val
-                for (const auto& col_pair : my_csc) {
-                  int row = col_pair.first; // Assume this is the row index from your `ColSpMatrix`
-                  
-                  std::pair<int, int> key = std::make_pair(row, col); // Construct the key
-                  if (coords_to_thread.find(key) != coords_to_thread.end()) {
-                      int m_worker = coords_to_thread.at(key); // Access the map with the correct key type
-                      network.send(Message(1, m_worker, col, v.second)); // Send message 1 to multiply
-                  }    
-                }
+                int m_worker = coords_to_thread.at(v.first); //finds M worker in column
+                network.send(Message(1, m_worker, v.first, v.second));//send message 1 to multiply
             }
                 //int m_worker = coords_to_thread.at(v.first); //finds M worker in column
                 //network.send(Message(1, m_worker, v.first, v.second));//send message 1 to multiply
