@@ -1,6 +1,6 @@
 import os
 
-env = Environment(ENV = os.environ, CXX="/data/sanchez/tools/gcc-12.2.0/bin/g++)
+env = Environment(ENV = os.environ, CXX="/data/sanchez/tools/gcc-12.2.0/bin/g++")
 env.Append( CPPFLAGS = [ "-g", "-std=c++20", "-Wextra", "-Wall", "-Werror" ] )
 
 assert "FMTROOT" in os.environ
