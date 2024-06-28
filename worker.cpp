@@ -41,8 +41,8 @@ void Worker::handle_message(Message msg) {
     switch (msg.type) {
         case 0: //case 0 go through vector, send workers messages of where it wants to multiply
             for (const auto& v : my_v){ //go through the vector SpVector = std::map<int,double>; //idx, val
-                std::pair<int, int> key = std::make_pair(v.first, some_value); // Construct the key
-                int m_worker = coords_to_thread.at(key);
+                //std::pair<int, int> key = std::make_pair(v.first, some_value); // Construct the key
+                int m_worker = coords_to_thread.at(v.first);
                 //int m_worker = coords_to_thread.at(v.first); //finds M worker in column
                 network.send(Message(1, m_worker, v.first, v.second));//send message 1 to multiply
             }
