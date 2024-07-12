@@ -1,6 +1,7 @@
 // Everything in this file is fair game to be modified
 #include "worker.h"
 #include <fmt/core.h>
+
 Worker::Worker(Network& _network, 
                const CoordsMap& _coords_to_thread, 
                const VecMap& _y_idx_to_thread,
@@ -43,17 +44,6 @@ void Worker::handle_message(Message msg) {
             }
                 //int m_worker = coords_to_thread.at(v.first); //finds M worker in column
                 //network.send(Message(1, m_worker, v.first, v.second));//send message 1 to multiply
-
-    
-        
-          
-    
-
-        
-        Expand All
-    
-    @@ -55,8 +59,9 @@ void Worker::handle_message(Message msg) {
-  
             break;
         case 1: //scenario 1: given vector, worker calculates csc, my_v, and sends it to worker in charge of y  
             if (my_csc.find(msg.coord) != my_csc.end()) {
@@ -64,17 +54,6 @@ void Worker::handle_message(Message msg) {
                   network.send(Message(2, y_worker, row.first, res));//send worker in charge of result to change y
                 }
               }
-
-    
-          
-            
-    
-
-          
-          Expand Down
-    
-    
-  
                   //add to my_y directly or add to partial here. 
             }
             //network.send(Message(1, (id + 1) % network.nthreads, 0, 0.0)); //raise done_flag! (aka sends this to the queue of jobs)
