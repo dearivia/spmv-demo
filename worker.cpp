@@ -41,12 +41,16 @@ void Worker::handle_message(Message msg) {
     switch (msg.type) {
         case 0: //case 0 go through vector, send workers messages of where it wants to multiply
             for (const auto& v : my_v){ //go through the vector SpVector = std::map<int,double>; //idx, val
-                for (const auto& [col, _] : my_csc) {
-                  if (coords_to_thread.find({v.first, col}) != coords_to_thread.end()) {
-                    int m_worker = coords_to_thread.at({v.first, col}); //finds M worker in column
-                    network.send(Message(1, m_worker, col, v.second));//send message 1 to multiply
+                //for (const auto& [col, _] : my_csc) {
+                  //if (coords_to_thread.find({v.first, col}) != coords_to_thread.end()) {
+                    //int m_worker = coords_to_thread.at({v.first, col}); //finds M worker in column
+                std::pair<int, int> key = std::make_pair(v.first, v.first);
+                auto x = coords_to_thread.find(key);
+                if (x != coords_to_thread.end()) {
+                    int m_worker = x->second;
+                    network.send(Message(1, m_worker, v.first, v.second));//send message 1 to multiply
                   }
-                }
+                //}
             }
                 //int m_worker = coords_to_thread.at(v.first); //finds M worker in column
                 //network.send(Message(1, m_worker, v.first, v.second));//send message 1 to multiply
@@ -55,8 +59,9 @@ void Worker::handle_message(Message msg) {
             if (my_csc.find(msg.coord) != my_csc.end()) {
               for (const auto& row : my_csc.at(msg.coord)) { //idx, val
                 double res = row.second*msg.payload;//result[row] += matrix[row][col]*vector[col]
-                if (y_idx_to_thread.find(row.first) != y_idx_to_thread.end()){
-                  int y_worker = y_idx_to_thread.at(row.first);//the worker in charge of result[row]//the worker in charge of result[row]
+                auto it = y_idx_to_thread.find(row.first);
+                if (it != y_idx_to_thread.end()) {
+                  int y_worker = it->second;//the worker in charge of result[row]//the worker in charge of result[row]
                   network.send(Message(2, y_worker, row.first, res));//send worker in charge of result to change y
                 }
               }
