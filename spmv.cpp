@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
         fmt::print("Usage: {} <matrix> <nthreads>\n", argv[0]);
         return 1;
     }
-    fmt::print(argv[1]);
+    fmt::print("{}\n", argv[1]);
     auto csc_mtx = MatrixMarket::read_csc<int,double>(argv[1]);
     int nthreads = std::stoi(argv[2]);
 
