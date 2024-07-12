@@ -42,7 +42,7 @@ void Worker::handle_message(Message msg) {
         case 0: //case 0 go through vector, send workers messages of where it wants to multiply
             for (const auto& v : my_v){ //go through the vector SpVector = std::map<int,double>; //idx, val
                 for (const auto& [col, _] : my_csc) {
-                  if (coords_to_thread.find(key) != coords_to_thread.end()) {
+                  if (coords_to_thread.find({v.first, col}) != coords_to_thread.end()) {
                     int m_worker = coords_to_thread.at({v.first, col}); //finds M worker in column
                     network.send(Message(1, m_worker, col, v.second));//send message 1 to multiply
                   }
