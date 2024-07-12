@@ -49,7 +49,9 @@ void Worker::handle_message(Message msg) {
                 if (x != coords_to_thread.end()) {
                     int m_worker = x->second;
                     network.send(Message(1, m_worker, v.first, v.second));//send message 1 to multiply
-                  }
+                  } else {
+                        fmt::print("Error: Key ({}, {}) not found in coords_to_thread\n", key.first, key.second);
+                    }
                 //}
             }
                 //int m_worker = coords_to_thread.at(v.first); //finds M worker in column
@@ -63,10 +65,14 @@ void Worker::handle_message(Message msg) {
                 if (it != y_idx_to_thread.end()) {
                   int y_worker = it->second;//the worker in charge of result[row]//the worker in charge of result[row]
                   network.send(Message(2, y_worker, row.first, res));//send worker in charge of result to change y
+                } else {
+                            fmt::print("Error: Key {} not found in y_idx_to_thread\n", row.first);
                 }
-              }
+              } 
                   //add to my_y directly or add to partial here. 
-            }
+            } else {
+                    fmt::print("Error: Key {} not found in my_csc\n", msg.coord);
+                }
             //network.send(Message(1, (id + 1) % network.nthreads, 0, 0.0)); //raise done_flag! (aka sends this to the queue of jobs)
             break;
         case 2: //scenario 2: worker in charge of y receives the partial sums from the earlier multiplication for y
