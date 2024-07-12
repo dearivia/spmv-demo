@@ -37,7 +37,8 @@ bool Worker::done() const {
 }
 
 void Worker::handle_message(Message msg) {
-    fmt::print("Worker {} handling message {}\n", id, msg);
+  fmt::print("Worker {} handling message {}\n", id, msg);
+  try { 
     switch (msg.type) {
         case 0: //case 0 go through vector, send workers messages of where it wants to multiply
             for (const auto& v : my_v){ //go through the vector SpVector = std::map<int,double>; //idx, val
@@ -91,5 +92,15 @@ void Worker::handle_message(Message msg) {
             break;
         default: //scenario 3: error
             fmt::print("Worker {} received unknown message type {}\n", id, msg.type);
+    }
+  } catch (const std::invalid_argument& e) {
+        fmt::print("std::invalid_argument: {}\n", e.what());
+        std::abort();
+    } catch (const std::exception& e) {
+        fmt::print("Exception: {}\n", e.what());
+        std::abort();
+    } catch (...) {
+        fmt::print("Unknown error occurred in Worker {}\n", id);
+        std::abort();
     }
 }
