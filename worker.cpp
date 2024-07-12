@@ -20,7 +20,7 @@ Worker::Worker(Network& _network,
     id(_my_id) {
     for (auto& y : y_idx_to_thread) { //fill out y_updates VecMap = std::map<int, int>; //idx of vector to where it's stored
         y_updates_left[y.first] = 0; //update index to 0
-        partial_sums[y.first] = 0;
+        partial_sums[y.first] = 0.0;
     }
 
 
@@ -41,18 +41,26 @@ void Worker::handle_message(Message msg) {
     switch (msg.type) {
         case 0: //case 0 go through vector, send workers messages of where it wants to multiply
             for (const auto& v : my_v){ //go through the vector SpVector = std::map<int,double>; //idx, val
-                int m_worker = coords_to_thread.at(v.first); //finds M worker in column
-                network.send(Message(1, m_worker, v.first, v.second));//send message 1 to multiply
+                for (const auto& [col, _] : my_csc) {
+                  if (coords_to_thread.find(key) != coords_to_thread.end()) {
+                    int m_worker = coords_to_thread.at({v.first, col}); //finds M worker in column
+                    network.send(Message(1, m_worker, col, v.second));//send message 1 to multiply
+                  }
+                }
             }
                 //int m_worker = coords_to_thread.at(v.first); //finds M worker in column
                 //network.send(Message(1, m_worker, v.first, v.second));//send message 1 to multiply
             break;
         case 1: //scenario 1: given vector, worker calculates csc, my_v, and sends it to worker in charge of y  
-            for (const auto& row : my_csc.at(msg.coord)) { //idx, val
+            if (my_csc.find(msg.coord) != my_csc.end()) {
+              for (const auto& row : my_csc.at(msg.coord)) { //idx, val
                 double res = row.second*msg.payload;//result[row] += matrix[row][col]*vector[col]
-                int y_worker = y_idx_to_thread.at(row.first);//the worker in charge of result[row]
-                network.send(Message(2, y_worker, row.first, res));//send worker in charge of result to change y
-                //add to my_y directly or add to partial here. 
+                if (y_idx_to_thread.find(row.first) != y_idx_to_thread.end()){
+                  int y_worker = y_idx_to_thread.at(row.first);//the worker in charge of result[row]
+                  network.send(Message(2, y_worker, row.first, res));//send worker in charge of result to change y
+                }
+              }
+                  //add to my_y directly or add to partial here. 
             }
             //network.send(Message(1, (id + 1) % network.nthreads, 0, 0.0)); //raise done_flag! (aka sends this to the queue of jobs)
             break;
