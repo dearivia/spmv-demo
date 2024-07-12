@@ -8,10 +8,10 @@
 #include "types.h"
 #include "network.h"
 
-using ColSpMatrix = std::map<int, std::vector<std::pair<int, double>>>;
-using SpVector = std::map<int, double>;
-using CoordsMap = std::map<std::pair<int, int>, int>;
-using VecMap = std::map<int, int>;
+//using ColSpMatrix = std::map<int, std::vector<std::pair<int, double>>>;
+//using SpVector = std::map<int, double>;
+//using CoordsMap = std::map<std::pair<int, int>, int>;
+//using VecMap = std::map<int, int>;
 
 class Worker {
 public:
