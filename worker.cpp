@@ -87,7 +87,7 @@ void Worker::handle_message(Message msg) {
                 fmt::print("Total updates left: {}\n", total_updates_left);
                 if (y_updates_left[msg.coord]<=0){
                     fmt::print("Updated my_y[{}] to {}\n", msg.coord, my_y[msg.coord]);
-                    my_y[msg.coord] = partial_sums[msg.coord];
+                    my_y[msg.coord] = partial_sums[msg.coord]; 
                 }
             }
             if (total_updates_left <= 0){
