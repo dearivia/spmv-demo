@@ -74,22 +74,23 @@ void Worker::handle_message(Message msg) {
             if (y_updates_left.find(msg.coord) != y_updates_left.end()) {
                 partial_sums[msg.coord] += msg.payload;
                 y_updates_left[msg.coord]--;
+                if (y_updates_left[msg.coord] <= 0) {
+                    fmt::print("Updated my_y[{}] to {}\n", msg.coord, partial_sums[msg.coord]);
+                    my_y[msg.coord] = partial_sums[msg.coord];
+                    y_updates_left.erase(msg.coord);
+                }
+                fmt::print("Updates left for coord {}: {}\n", msg.coord, y_updates_left[msg.coord]);
                 total_updates_left--;
                 if (total_updates_left < 0) {
                     fmt::print("Warning: Total updates left is negative.\n");
                 }
-                if (y_updates_left[msg.coord] == 0) {
-                    fmt::print("Updated my_y[{}] to {}\n", msg.coord, partial_sums[msg.coord]);
-                    my_y[msg.coord] = partial_sums[msg.coord];
-                }
-                fmt::print("Updates left for coord {}: {}\n", msg.coord, y_updates_left[msg.coord]);
                 fmt::print("Total updates left: {}\n", total_updates_left);
-                if (y_updates_left[msg.coord]==0){
+                if (y_updates_left[msg.coord]<=0){
                     fmt::print("Updated my_y[{}] to {}\n", msg.coord, my_y[msg.coord]);
                     my_y[msg.coord] = partial_sums[msg.coord];
                 }
             }
-            if (total_updates_left == 0){
+            if (total_updates_left <= 0){
                 for (int i = 0; i < network.nthreads; ++i) {
                     network.send(Message(3, i, 0, 0.0));  // Send type 3 message to all workers, # of workers = int nthreads
                 }
