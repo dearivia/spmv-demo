@@ -17,6 +17,7 @@ Worker::Worker(Network& _network,
     my_y(_my_y), 
     id(_my_id) {
     fmt::print("Worker {} initialized, /n", id);
+    total_updates_left = 0;
     for (auto& y : y_idx_to_thread) { //fill out y_updates VecMap = std::map<int, int>; //idx of vector to where it's stored
         y_updates_left[y.first] = 0; //update index to 0
         partial_sums[y.first] = 0.0;
@@ -26,6 +27,7 @@ Worker::Worker(Network& _network,
 //index into map, pull out second vector and loop through vector
         for (const auto& row : col.second) {
             y_updates_left[row.first]++; //loop through, if col, row exists, then update++
+            total_updates_left++;
             fmt::print("my_csc: ({}, {}) -> {}\n", col.first, row.first, row.second);
         }
     }
@@ -48,7 +50,6 @@ void Worker::handle_message(Message msg) {
                   }
                   }
             }
-            done_flag = true;
                 //int m_worker = coords_to_thread.at(v.first); //finds M worker in column
                 //network.send(Message(1, m_worker, v.first, v.second));//send message 1 to multiply
             break;
@@ -72,10 +73,16 @@ void Worker::handle_message(Message msg) {
             fmt::print("Message case 2 processing for coord {} with payload {}\n", msg.coord, msg.payload);
             partial_sums[msg.coord] += msg.payload;
             y_updates_left[msg.coord]--;
+            total_updates_left--;
             fmt::print("Updates left for coord {}: {}\n", msg.coord, y_updates_left[msg.coord]);
             if (y_updates_left[msg.coord]==0){
                 fmt::print("Updated my_y[{}] to {}\n", msg.coord, my_y[msg.coord]);
                 my_y[msg.coord] = partial_sums[msg.coord];
+            }
+            if (total_updates_left == 0){
+                for (int i = 0; i < network.nthreads; ++i) {
+                    network.send(Message(3, i, 0, 0.0));  // Send type 3 message to all workers
+                }
             }
             //if everything is done, then set done value to be done, be careful of scenario 1
             //my_y[msg.coord] += msg.payload; message coordinate of y adds result to summation
