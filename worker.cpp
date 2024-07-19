@@ -48,6 +48,7 @@ void Worker::handle_message(Message msg) {
                   }
                   }
             }
+            done_flag = true;
                 //int m_worker = coords_to_thread.at(v.first); //finds M worker in column
                 //network.send(Message(1, m_worker, v.first, v.second));//send message 1 to multiply
             break;
