@@ -71,19 +71,22 @@ void Worker::handle_message(Message msg) {
             break;
         case 2: //scenario 2: worker in charge of y receives the partial sums from the earlier multiplication for y
             fmt::print("Message case 2 processing for coord {} with payload {}\n", msg.coord, msg.payload);
-            partial_sums[msg.coord] += msg.payload;
-            y_updates_left[msg.coord]--;
-            total_updates_left--;
-            fmt::print("Updates left for coord {}: {}\n", msg.coord, y_updates_left[msg.coord]);
-            fmt::print("Total updates left: {}\n", total_updates_left);
-            if (y_updates_left[msg.coord]==0){
-                fmt::print("Updated my_y[{}] to {}\n", msg.coord, my_y[msg.coord]);
-                my_y[msg.coord] = partial_sums[msg.coord];
+            if (y_updates_left.find(msg.coord) != y_updates_left.end()) {
+                partial_sums[msg.coord] += msg.payload;
+                y_updates_left[msg.coord]--;
+                total_updates_left--;
+                fmt::print("Updates left for coord {}: {}\n", msg.coord, y_updates_left[msg.coord]);
+                fmt::print("Total updates left: {}\n", total_updates_left);
+                if (y_updates_left[msg.coord]==0){
+                    fmt::print("Updated my_y[{}] to {}\n", msg.coord, my_y[msg.coord]);
+                    my_y[msg.coord] = partial_sums[msg.coord];
+                }
             }
             if (total_updates_left == 0){
                 for (int i = 0; i < network.nthreads; ++i) {
                     network.send(Message(3, i, 0, 0.0));  // Send type 3 message to all workers, # of workers = int nthreads
                 }
+                done_flag = true;
             }
             //if everything is done, then set done value to be done, be careful of scenario 1
             //my_y[msg.coord] += msg.payload; message coordinate of y adds result to summation
