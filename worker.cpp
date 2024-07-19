@@ -44,11 +44,11 @@ void Worker::handle_message(Message msg) {
                 fmt::print("Processing vector element: ({}, {})\n", v.first, v.second);
                 for (const auto& [col, _] : my_csc) {
                   if (coords_to_thread.find({v.first, col}) != coords_to_thread.end()) {
-                    fmt::print("Sending message type 1 to worker {}\n", m_worker);
                     int m_worker = coords_to_thread.at({v.first, col}); //finds M worker in column
+                    fmt::print("Sending message type 1 to worker {}\n", m_worker);
                     network.send(Message(1, m_worker, col, v.second));//send message 1 to multiply
                   }
-                  }
+                }
             }
                 //int m_worker = coords_to_thread.at(v.first); //finds M worker in column
                 //network.send(Message(1, m_worker, v.first, v.second));//send message 1 to multiply
@@ -60,8 +60,8 @@ void Worker::handle_message(Message msg) {
                 fmt::print("Processing row: ({}, {}) with payload {}\n", row.first, row.second, msg.payload);
                 double res = row.second*msg.payload;//result[row] += matrix[row][col]*vector[col]
                 if (y_idx_to_thread.find(row.first) != y_idx_to_thread.end()){
-                  fmt::print("Sending message type 2 to worker {}\n", y_worker);
                   int y_worker = y_idx_to_thread.at(row.first);//the worker in charge of result[row]//the worker in charge of result[row]
+                  fmt::print("Sending message type 2 to worker {}\n", y_worker);
                   network.send(Message(2, y_worker, row.first, res));//send worker in charge of result to change y
                 }
               }
@@ -81,7 +81,7 @@ void Worker::handle_message(Message msg) {
             }
             if (total_updates_left == 0){
                 for (int i = 0; i < network.nthreads; ++i) {
-                    network.send(Message(3, i, 0, 0.0));  // Send type 3 message to all workers
+                    network.send(Message(3, i, 0, 0.0));  // Send type 3 message to all workers, # of workers = int nthreads
                 }
             }
             //if everything is done, then set done value to be done, be careful of scenario 1
