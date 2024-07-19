@@ -75,6 +75,13 @@ void Worker::handle_message(Message msg) {
                 partial_sums[msg.coord] += msg.payload;
                 y_updates_left[msg.coord]--;
                 total_updates_left--;
+                if (total_updates_left < 0) {
+                    fmt::print("Warning: Total updates left is negative.\n");
+                }
+                if (y_updates_left[msg.coord] == 0) {
+                    fmt::print("Updated my_y[{}] to {}\n", msg.coord, partial_sums[msg.coord]);
+                    my_y[msg.coord] = partial_sums[msg.coord];
+                }
                 fmt::print("Updates left for coord {}: {}\n", msg.coord, y_updates_left[msg.coord]);
                 fmt::print("Total updates left: {}\n", total_updates_left);
                 if (y_updates_left[msg.coord]==0){
