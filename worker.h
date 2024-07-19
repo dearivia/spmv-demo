@@ -39,5 +39,4 @@ private:
     int total_updates_left;
     std::map<int, int> y_updates_left; //idx, val
     std::map<int, double> partial_sums; //idx, val
-    int total_updates_left;
 };
