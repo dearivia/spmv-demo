@@ -82,7 +82,7 @@ void Worker::handle_message(Message msg) {
             //wait until all summations are gotten before sending
             break;
         case 3: //scenario 3: when worker is done processing
-            fmt::print("Message type 3: Setting done_flag to true.\n");
+            fmt::print("Message case 3: Setting done_flag to true.\n");
             done_flag = true;
             break;
         default: //scenario 3: error
