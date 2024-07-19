@@ -26,10 +26,10 @@ Worker::Worker(Network& _network,
     for (auto& col : my_csc){ //using ColSpMatrix = std::map<int, std::vector<std::pair<int,double>>>; //col_idx -> (row_idx,val)
 //index into map, pull out second vector and loop through vector
         for (const auto& row : col.second) {
-            y_updates_left[row.first]++; //loop through, if col, row exists, then update++
+            y_updates_left[row.first]++; //loop through, if col, row exists, then update++ 
             total_updates_left++;
             fmt::print("my_csc: ({}, {}) -> {}\n", col.first, row.first, row.second);
-        }
+        } //check if y_updates is the right amount ksjd
     }
 }
 bool Worker::done() const {
@@ -74,10 +74,13 @@ void Worker::handle_message(Message msg) {
             if (y_updates_left.find(msg.coord) != y_updates_left.end()) {
                 partial_sums[msg.coord] += msg.payload;
                 y_updates_left[msg.coord]--;
-                if (y_updates_left[msg.coord] <= 0) {
+                if (y_updates_left[msg.coord] == 0) {
                     fmt::print("Updated my_y[{}] to {}\n", msg.coord, partial_sums[msg.coord]);
                     my_y[msg.coord] = partial_sums[msg.coord];
                     y_updates_left.erase(msg.coord);
+                }
+                if (y_updates_left[msg.coord] < 0) {
+                    fmt::print("Warning: y updates left is negative.\n");
                 }
                 fmt::print("Updates left for coord {}: {}\n", msg.coord, y_updates_left[msg.coord]);
                 total_updates_left--;
@@ -90,7 +93,7 @@ void Worker::handle_message(Message msg) {
                     my_y[msg.coord] = partial_sums[msg.coord]; 
                 }
             }
-            if (total_updates_left <= 0){
+            if (total_updates_left == 0){
                 for (int i = 0; i < network.nthreads; ++i) {
                     network.send(Message(3, i, 0, 0.0));  // Send type 3 message to all workers, # of workers = int nthreads
                 }
