@@ -75,6 +75,12 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "cassert": "cpp",
-        "coroutine": "cpp"
+        "coroutine": "cpp",
+        "condition_variable": "cpp",
+        "fstream": "cpp",
+        "mutex": "cpp",
+        "semaphore": "cpp",
+        "stop_token": "cpp",
+        "thread": "cpp"
     }
 }
